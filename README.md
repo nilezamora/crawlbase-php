@@ -136,9 +136,10 @@ You can always get the original status and crawlbase status from the response. R
 ```php
 $response = $api->get('https://craiglist.com');
 echo $response->headers->original_status . PHP_EOL;
-echo $response->headers->pc_status . PHP_EOL;
+echo $response->headers->cb_status . PHP_EOL;
 ```
 
+`pc_status` is still available as a deprecated alias for `cb_status` and will be removed in a future major version.
 ## Scraper API
 
 First initialize the ScraperAPI class. You can [get your free token here](https://crawlbase.com/signup?signup=github). Please note that only some websites are supported, check the [API documentation](https://crawlbase.com/docs/scraper-api/) for more information.
@@ -238,7 +239,7 @@ echo 'status code: ' . $response->statusCode . PHP_EOL;
 if ($response->statusCode === 200) {
   echo 'body: ' . $response->body . PHP_EOL;
   echo 'original status: ' . $response->headers->original_status . PHP_EOL;
-  echo 'crawlbase status: ' . $response->headers->pc_status . PHP_EOL;
+  echo 'crawlbase status: ' . $response->headers->cb_status . PHP_EOL;
   echo 'rid: ' . $response->headers->rid . PHP_EOL;
   echo 'url: ' . $response->headers->url . PHP_EOL;
   echo 'stored date: ' . $response->headers->stored_at . PHP_EOL;
@@ -254,7 +255,7 @@ echo 'status code: ' . $response->statusCode . PHP_EOL;
 if ($response->statusCode === 200) {
   echo 'body: ' . $response->body . PHP_EOL;
   echo 'original status: ' . $response->headers->original_status . PHP_EOL;
-  echo 'crawlbase status: ' . $response->headers->pc_status . PHP_EOL;
+  echo 'crawlbase status: ' . $response->headers->cb_status . PHP_EOL;
   echo 'rid: ' . $response->headers->rid . PHP_EOL;
   echo 'url: ' . $response->headers->url . PHP_EOL;
   echo 'stored date: ' . $response->headers->stored_at . PHP_EOL;
@@ -287,7 +288,7 @@ foreach ($items as $item) {
   echo 'body: ' . $item->body . PHP_EOL;
   echo 'stored at: ' . $item->stored_at . PHP_EOL;
   echo 'original status: ' . $item->original_status . PHP_EOL;
-  echo 'crawlbase status: ' . $item->pc_status . PHP_EOL;
+  echo 'crawlbase status: ' . $item->cb_status . PHP_EOL;
   echo 'rid: ' . $item->rid . PHP_EOL;
   echo 'url: ' . $item->url . PHP_EOL;
   echo PHP_EOL;

@@ -51,7 +51,7 @@ class StorageAPI extends BaseAPI {
 
     $this->setEndpoint('storage/bulk');
     $this->request($options, $data);
-    return $this->response->json;
+    return $this->aliasStatusOnStorageItems($this->response->json);
   }
 
   public function rids($limit = -1, array $options = array()) {
@@ -67,5 +67,29 @@ class StorageAPI extends BaseAPI {
     $this->setEndpoint('storage/total_count');
     $this->request($options);
     return $this->response->json->totalCount;
+  }
+
+  /**
+   * Ensure storage items expose cb_status with pc_status kept as a deprecated alias.
+   *
+   * @param mixed $items
+   * @return mixed
+   */
+  private function aliasStatusOnStorageItems($items) {
+    if (is_array($items)) {
+      foreach ($items as &$item) {
+        if (is_object($item) || is_array($item)) {
+          $this->assignCrawlbaseStatus($item, $item);
+        }
+      }
+      unset($item);
+      return $items;
+    }
+
+    if (is_object($items)) {
+      $this->assignCrawlbaseStatus($items, $items);
+    }
+
+    return $items;
   }
 }

@@ -2,6 +2,11 @@
 
 Only major versions or things to communicate are written here. Minor changes or bug fixes might not appear in the changelog.
 
+## 3.1.0
+
+Introduces `cb_status` as the preferred Crawlbase status field and deprecates `pc_status`.  
+Both names are dual-written on responses so existing code continues to work; migrate to `cb_status`. `pc_status` will be removed in a future major version.
+
 ## 3.0.0
 
 Adds Screenshots API and Storage API.  

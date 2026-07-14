@@ -127,6 +127,10 @@ class BaseAPI {
 
     curl_close($curl);
 
+    if (is_array($this->response) && isset($this->response['headers']) && is_array($this->response['headers'])) {
+      $this->normalizeCrawlbaseStatusHeaders($this->response['headers']);
+    }
+
     // Cast to object for easier access
     $this->response = (object) $this->response;
     if (isset($this->response->headers)) {
@@ -161,7 +165,7 @@ class BaseAPI {
     $json = json_decode($this->response['body']);
     if (!empty($json->original_status)) {
       $this->response['headers']['original_status'] = $json->original_status;
-      $this->response['headers']['pc_status'] = $json->pc_status;
+      $this->assignCrawlbaseStatus($this->response['headers'], $json);
       $this->response['headers']['url'] = $json->url;
     }
     if (!empty($json->remaining_requests)) {
@@ -172,6 +176,59 @@ class BaseAPI {
     } else {
       $this->response['json'] = $json;
     }
+  }
+
+  /**
+   * Prefer cb_status, fall back to deprecated pc_status, and dual-write both.
+   *
+   * @param array|object $target Destination that will receive both status keys
+   * @param array|object $source Source that may contain cb_status and/or pc_status
+   */
+  protected function assignCrawlbaseStatus(&$target, $source) {
+    $cbStatus = $this->readStatusValue($source, 'cb_status');
+    $pcStatus = $this->readStatusValue($source, 'pc_status');
+    $status = $cbStatus !== null ? $cbStatus : $pcStatus;
+
+    if ($status === null) {
+      return;
+    }
+
+    if (is_array($target)) {
+      $target['cb_status'] = $status;
+      $target['pc_status'] = $status; // deprecated alias
+    } else {
+      $target->cb_status = $status;
+      $target->pc_status = $status; // deprecated alias
+    }
+  }
+
+  /**
+   * Dual-write cb_status / pc_status on response headers after HTTP metadata is collected.
+   *
+   * @param array $headers
+   */
+  protected function normalizeCrawlbaseStatusHeaders(array &$headers) {
+    $this->assignCrawlbaseStatus($headers, $headers);
+  }
+
+  /**
+   * @param array|object $source
+   * @param string $key
+   * @return mixed|null
+   */
+  private function readStatusValue($source, $key) {
+    if (is_array($source)) {
+      if (!array_key_exists($key, $source) || $source[$key] === '' || $source[$key] === null) {
+        return null;
+      }
+      return $source[$key];
+    }
+
+    if (!is_object($source) || !isset($source->$key) || $source->$key === '') {
+      return null;
+    }
+
+    return $source->$key;
   }
 
 }
